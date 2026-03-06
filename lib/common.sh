@@ -40,11 +40,11 @@ random_uuid() {
 }
 
 public_ip() {
-  curl -4 -fsS --max-time 10 https://api.ipify.org || true
+  curl -4 -fsS --max-time 10 https://api.ipify.org 2>/dev/null || true
 }
 
 public_ip_v6() {
-  curl -6 -fsS --max-time 10 https://api64.ipify.org || true
+  curl -6 -fsS --max-time 10 https://api64.ipify.org 2>/dev/null || true
 }
 
 default_server_host() {

@@ -6,7 +6,7 @@ install_vless_reality() {
   ensure_dir "$PROXY_INSTALLER_HOME/vless-reality"
 
   local default_host domain port server_name input_sni uuid private_key public_key short_id
-  local config_path service_path keypair_output
+  local config_path service_path keypair_output xray_bin
 
   default_host="$(default_server_host)"
   read -r -p "Server IP or domain [${default_host}]: " domain
@@ -30,12 +30,26 @@ install_vless_reality() {
   uuid="$(random_uuid)"
   short_id="$(openssl rand -hex 4)"
 
-  keypair_output="$(xray x25519)"
-  private_key="$(awk -F': ' '/Private key/ {print $2}' <<< "$keypair_output")"
-  public_key="$(awk -F': ' '/Public key/ {print $2}' <<< "$keypair_output")"
+  xray_bin="$(command -v xray || true)"
+  if [[ -z "$xray_bin" && -x /usr/local/bin/xray ]]; then
+    xray_bin="/usr/local/bin/xray"
+  fi
+  if [[ -z "$xray_bin" && -x /usr/bin/xray ]]; then
+    xray_bin="/usr/bin/xray"
+  fi
+  if [[ -z "$xray_bin" ]]; then
+    error "xray binary not found after install"
+    return 1
+  fi
+
+  keypair_output="$($xray_bin x25519 2>&1 || true)"
+  private_key="$(sed -n 's/.*Private key: *//p' <<< "$keypair_output" | head -n1 | tr -d '\r')"
+  public_key="$(sed -n 's/.*Public key: *//p' <<< "$keypair_output" | head -n1 | tr -d '\r')"
 
   if [[ -z "$private_key" || -z "$public_key" ]]; then
     error "Failed to generate Reality key pair"
+    warn "xray x25519 output was:"
+    printf '%s\n' "$keypair_output" >&2
     return 1
   fi
 
@@ -84,7 +98,7 @@ install_vless_reality() {
 }
 EOF
 
-  if ! xray run -test -config "$config_path"; then
+  if ! "$xray_bin" run -test -config "$config_path"; then
     error "Generated Xray config failed validation"
     return 1
   fi
@@ -96,7 +110,7 @@ After=network.target
 
 [Service]
 Type=simple
-ExecStart=/usr/local/bin/xray run -config ${config_path}
+ExecStart=${xray_bin} run -config ${config_path}
 Restart=on-failure
 RestartSec=3
 LimitNOFILE=1048576
