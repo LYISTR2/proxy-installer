@@ -43,8 +43,8 @@ install_xray() {
     return 0
   fi
 
-  info "Installing xray"
-  bash <(curl -fsSL https://github.com/XTLS/Xray-install/raw/main/install-release.sh) install
+  info "Installing xray v25.10.15"
+  bash <(curl -fsSL https://github.com/XTLS/Xray-install/raw/main/install-release.sh) install --version v25.10.15
 }
 
 install_hysteria2_binary() {

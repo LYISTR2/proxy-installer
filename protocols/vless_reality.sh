@@ -17,7 +17,7 @@ install_vless_reality() {
     return 1
   fi
 
-  server_name="www.cloudflare.com"
+  server_name="learn.microsoft.com"
   read -r -p "Reality SNI target [${server_name}]: " input_sni
   server_name="${input_sni:-$server_name}"
   port="$(pick_port "Listen port" 443)"
@@ -68,7 +68,7 @@ install_vless_reality() {
   },
   "inbounds": [
     {
-      "listen": "::",
+      "listen": "0.0.0.0",
       "port": ${port},
       "protocol": "vless",
       "settings": {
@@ -91,6 +91,10 @@ install_vless_reality() {
           "privateKey": "${private_key}",
           "shortIds": ["${short_id}"]
         }
+      },
+      "sniffing": {
+        "enabled": true,
+        "destOverride": ["http", "tls", "quic"]
       }
     }
   ],
