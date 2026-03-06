@@ -38,10 +38,13 @@ install_trojan() {
   "run_type": "server",
   "local_addr": "::",
   "local_port": ${port},
+  "remote_addr": "www.apple.com",
+  "remote_port": 443,
   "password": ["${password}"],
   "ssl": {
     "cert": "${cert_path}",
-    "key": "${key_path}"
+    "key": "${key_path}",
+    "sni": "${domain}"
   }
 }
 EOF
