@@ -68,12 +68,31 @@ EOF
 
 print_shadowsocks_summary() {
   local method="$1" password="$2" port="$3" host="$4"
+  local link_host="$host"
+  if [[ "$link_host" == *:* ]]; then
+    link_host="[$link_host]"
+  fi
+  local creds encoded name
+  name="ss2022-${host//:/-}-${port}"
+  creds="${method}:${password}"
+  encoded="$(printf '%s' "$creds" | base64 -w 0 2>/dev/null || printf '%s' "$creds" | base64 | tr -d '\n')"
   cat <<EOF
-==== Shadowsocks ====
-Address  : ${host}
-Port     : ${port}
-Method   : ${method}
-Password : ${password}
+==== Shadowsocks 2022 ====
+
+[Share Link]
+ss://${encoded}@${link_host}:${port}#${name}
+
+[Manual Config]
+Type        : Shadowsocks 2022
+Address     : ${host}
+Port        : ${port}
+Method      : ${method}
+Password    : ${password}
+Transport   : tcp+udp
+
+[Client Notes]
+- Use a client that supports Shadowsocks 2022.
+- If direct import fails, create a Shadowsocks node manually with the fields above.
 EOF
 }
 

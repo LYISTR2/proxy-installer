@@ -63,8 +63,29 @@ install_shadowsocks_rust() {
     return 0
   fi
 
-  info "Installing shadowsocks-rust"
-  eval "$PKG_INSTALL shadowsocks-rust"
+  local tmp_dir latest arch asset url
+  tmp_dir="$(mktemp -d)"
+  latest="$(curl -fsSL https://api.github.com/repos/shadowsocks/shadowsocks-rust/releases/latest | jq -r '.tag_name')"
+  arch="$(uname -m)"
+
+  case "$arch" in
+    x86_64|amd64) asset="shadowsocks-${latest}.x86_64-unknown-linux-gnu.tar.xz" ;;
+    aarch64|arm64) asset="shadowsocks-${latest}.aarch64-unknown-linux-gnu.tar.xz" ;;
+    *)
+      error "Unsupported architecture for shadowsocks-rust: $arch"
+      rm -rf "$tmp_dir"
+      return 1
+      ;;
+  esac
+
+  url="https://github.com/shadowsocks/shadowsocks-rust/releases/download/${latest}/${asset}"
+
+  info "Installing shadowsocks-rust ${latest}"
+  curl -fsSL "$url" -o "$tmp_dir/ss.tar.xz"
+  tar -xJf "$tmp_dir/ss.tar.xz" -C "$tmp_dir"
+  install -m 0755 "$tmp_dir/ssserver" /usr/local/bin/ssserver
+  install -m 0755 "$tmp_dir/ssservice" /usr/local/bin/ssservice 2>/dev/null || true
+  rm -rf "$tmp_dir"
 }
 
 install_trojan_go() {
