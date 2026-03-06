@@ -98,10 +98,28 @@ EOF
 
 print_trojan_summary() {
   local domain="$1" port="$2" password="$3"
+  local link_domain="$domain"
+  if [[ "$link_domain" == *:* ]]; then
+    link_domain="[$link_domain]"
+  fi
+  local name="trojan-${domain//:/-}-${port}"
   cat <<EOF
 ==== Trojan ====
-Address  : ${domain}
-Port     : ${port}
-Password : ${password}
+
+[Share Link]
+trojan://${password}@${link_domain}:${port}?security=tls&sni=${domain}&allowInsecure=1#${name}
+
+[Manual Config]
+Type         : Trojan
+Address      : ${domain}
+Port         : ${port}
+Password     : ${password}
+TLS          : enabled
+SNI          : ${domain}
+AllowInsecure: true
+
+[Client Notes]
+- NekoBox / v2rayN / Shadowrocket: import the share link directly.
+- This v0.1 setup uses a self-signed certificate, so clients usually need Allow Insecure enabled.
 EOF
 }

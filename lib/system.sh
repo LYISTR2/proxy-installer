@@ -102,6 +102,6 @@ install_trojan_go() {
   info "Installing trojan-go ${latest}"
   curl -fsSL "$url" -o "$tmp_dir/trojan-go.zip"
   unzip -qo "$tmp_dir/trojan-go.zip" -d "$tmp_dir"
-  install -m 0755 "$tmp_dir/trojan-go/trojan-go" "$BIN_DIR/trojan-go"
+  install -m 0755 "$tmp_dir/trojan-go" "$BIN_DIR/trojan-go"
   rm -rf "$tmp_dir"
 }
