@@ -5,9 +5,10 @@ install_hysteria2() {
   install_hysteria2_binary
   ensure_dir "$PROXY_INSTALLER_HOME/hysteria2"
 
-  local domain port password config_path service_path cert_path key_path
-  read -r -p "Server IP or domain [$(public_ip)]: " domain
-  domain="${domain:-$(public_ip)}"
+  local default_host domain port password config_path service_path cert_path key_path
+  default_host="$(default_server_host)"
+  read -r -p "Server IP or domain [${default_host}]: " domain
+  domain="${domain:-$default_host}"
   port="$(pick_port "Listen port" 8443)"
 
   if port_in_use "$port"; then
@@ -66,4 +67,5 @@ EOF
   info "hysteria2-server started successfully"
   service_status_brief hysteria2-server
   print_hysteria2_summary "$domain" "$port" "$password"
+  print_runtime_check "hysteria2-server" "$port" "udp"
 }

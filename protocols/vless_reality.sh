@@ -134,4 +134,5 @@ EOF
   info "xray-vless-reality started successfully"
   service_status_brief xray-vless-reality
   print_vless_reality_summary "$domain" "$port" "$uuid" "$public_key" "$short_id" "$server_name"
+  print_runtime_check "xray-vless-reality" "$port" "tcp"
 }

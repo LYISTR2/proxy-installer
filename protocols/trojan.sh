@@ -75,4 +75,5 @@ EOF
   info "trojan-go started successfully"
   service_status_brief trojan-go
   print_trojan_summary "$domain" "$port" "$password"
+  print_runtime_check "trojan-go" "$port" "tcp"
 }

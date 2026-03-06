@@ -26,6 +26,39 @@ service_last_logs() {
   journalctl -u "$service" -n 50 --no-pager || true
 }
 
+service_is_active() {
+  local service="$1"
+  systemctl is-active --quiet "$service"
+}
+
+port_listening() {
+  local port="$1"
+  ss -lntup 2>/dev/null | awk '{print $5}' | grep -Eq "[:\.]${port}$"
+}
+
+print_runtime_check() {
+  local service="$1"
+  local port="$2"
+  local proto="$3"
+  local service_state="inactive"
+  local port_state="not-detected"
+
+  if service_is_active "$service"; then
+    service_state="active"
+  fi
+
+  if port_listening "$port"; then
+    port_state="listening"
+  fi
+
+  cat <<EOF
+
+[Runtime Check]
+Service     : ${service} (${service_state})
+Port        : ${port}/${proto} (${port_state})
+EOF
+}
+
 restart_service() {
   local service="$1"
   reload_systemd

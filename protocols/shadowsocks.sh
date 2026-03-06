@@ -63,4 +63,5 @@ EOF
   info "shadowsocks-rust started successfully"
   service_status_brief shadowsocks-rust
   print_shadowsocks_summary "$method" "$password" "$port" "$host"
+  print_runtime_check "shadowsocks-rust" "$port" "tcp+udp"
 }
