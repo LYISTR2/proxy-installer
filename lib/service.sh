@@ -7,12 +7,12 @@ reload_systemd() {
 enable_now() {
   local service="$1"
   reload_systemd
+  systemctl enable "$service" >/dev/null 2>&1 || true
 
-  if systemctl list-unit-files | grep -q "^${service}\.service"; then
-    systemctl enable "$service" >/dev/null 2>&1 || true
+  if systemctl is-active --quiet "$service"; then
     systemctl restart "$service"
   else
-    systemctl enable --now "$service"
+    systemctl start "$service"
   fi
 }
 
