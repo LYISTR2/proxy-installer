@@ -34,7 +34,7 @@ detect_system() {
 install_base_packages() {
   info "Installing base packages"
   apt-get update
-  eval "$PKG_INSTALL curl wget tar gzip unzip openssl ca-certificates jq systemd iproute2"
+  eval "$PKG_INSTALL curl wget tar gzip unzip xz-utils openssl ca-certificates jq systemd iproute2"
 }
 
 install_xray() {
