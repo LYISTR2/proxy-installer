@@ -56,6 +56,14 @@ RestartSec=3
 WantedBy=multi-user.target
 EOF
 
-  enable_now hysteria2-server
+  if ! enable_now hysteria2-server; then
+    error "Failed to start hysteria2-server"
+    service_status_brief hysteria2-server
+    service_last_logs hysteria2-server
+    return 1
+  fi
+
+  info "hysteria2-server started successfully"
+  service_status_brief hysteria2-server
   print_hysteria2_summary "$domain" "$port" "$password"
 }

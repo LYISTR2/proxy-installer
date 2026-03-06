@@ -38,12 +38,31 @@ EOF
 
 print_hysteria2_summary() {
   local domain="$1" port="$2" password="$3"
+  local link_domain="$domain"
+  if [[ "$link_domain" == *:* ]]; then
+    link_domain="[$link_domain]"
+  fi
+  local name="hy2-${domain//:/-}-${port}"
+  local hy2_link="hy2://${password}@${link_domain}:${port}/?sni=${domain}&insecure=1#${name}"
   cat <<EOF
 ==== Hysteria2 ====
-Address   : ${domain}
-Port      : ${port}
-Password  : ${password}
-Transport : udp
+
+[Share Link]
+${hy2_link}
+
+[Manual Config]
+Type        : Hysteria2
+Address     : ${domain}
+Port        : ${port}
+Password    : ${password}
+Transport   : udp
+TLS         : self-signed
+SNI         : ${domain}
+AllowInsecure: true
+
+[Client Notes]
+- NekoBox / sing-box / Hiddify: import the share link directly.
+- This v0.1 setup uses a self-signed certificate, so clients usually need Allow Insecure enabled.
 EOF
 }
 
