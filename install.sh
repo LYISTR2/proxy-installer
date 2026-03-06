@@ -45,7 +45,9 @@ source "$SCRIPT_DIR/protocols/trojan.sh"
 
 main_menu() {
   while true; do
-    clear || true
+    if [[ -n "${TERM:-}" ]]; then
+      clear || true
+    fi
     echo "==== Proxy Installer ===="
     echo "1) Install VLESS Reality"
     echo "2) Install Hysteria2"
