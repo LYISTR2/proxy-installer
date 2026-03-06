@@ -6,19 +6,33 @@ print_vless_reality_summary() {
   if [[ "$link_domain" == *:* ]]; then
     link_domain="[$link_domain]"
   fi
-  local vless_link="vless://${uuid}@${link_domain}:${port}?encryption=none&flow=xtls-rprx-vision&security=reality&sni=${server_name}&fp=chrome&pbk=${public_key}&sid=${short_id}&type=tcp&headerType=none#vless-reality"
+
+  local name="vless-reality-${domain//:/-}-${port}"
+  local vless_link="vless://${uuid}@${link_domain}:${port}?encryption=none&flow=xtls-rprx-vision&security=reality&sni=${server_name}&fp=chrome&pbk=${public_key}&sid=${short_id}&type=tcp&headerType=none#${name}"
+
   cat <<EOF
 ==== VLESS Reality ====
+
+[Share Link]
+${vless_link}
+
+[Manual Config]
+Type        : VLESS
 Address     : ${domain}
 Port        : ${port}
 UUID        : ${uuid}
 Flow        : xtls-rprx-vision
-Public Key  : ${public_key}
-Short ID    : ${short_id}
-SNI         : ${server_name}
 Transport   : tcp
 Security    : reality
-Link        : ${vless_link}
+SNI         : ${server_name}
+Fingerprint : chrome
+Public Key  : ${public_key}
+Short ID    : ${short_id}
+
+[Client Notes]
+- NekoBox / v2rayN / v2rayNG: import the share link directly.
+- If direct import fails, create a VLESS node manually with the fields above.
+- Network=tcp, TLS/REALITY enabled, packet encoding left default.
 EOF
 }
 
