@@ -1,6 +1,30 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+bootstrap_if_needed() {
+  local current_script script_dir
+  current_script="${BASH_SOURCE[0]}"
+  script_dir="$(cd "$(dirname "$current_script")" 2>/dev/null && pwd || true)"
+
+  if [[ -n "$script_dir" && -f "$script_dir/lib/common.sh" && -f "$script_dir/protocols/vless_reality.sh" ]]; then
+    return 0
+  fi
+
+  local tmp_dir repo_url
+  tmp_dir="$(mktemp -d)"
+  repo_url="https://github.com/LYISTR2/proxy-installer.git"
+
+  echo "[INFO] Bootstrap mode: downloading full repository..."
+  git clone --depth=1 "$repo_url" "$tmp_dir/proxy-installer" >/dev/null 2>&1 || {
+    echo "[ERROR] Failed to clone repository: $repo_url" >&2
+    exit 1
+  }
+
+  exec bash "$tmp_dir/proxy-installer/install.sh" "$@"
+}
+
+bootstrap_if_needed "$@"
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=lib/common.sh
 source "$SCRIPT_DIR/lib/common.sh"
