@@ -43,8 +43,13 @@ install_vless_reality() {
   fi
 
   keypair_output="$($xray_bin x25519 2>&1 || true)"
-  private_key="$(sed -n 's/.*Private key: *//p' <<< "$keypair_output" | head -n1 | tr -d '\r')"
-  public_key="$(sed -n 's/.*Public key: *//p' <<< "$keypair_output" | head -n1 | tr -d '\r')"
+  private_key="$(sed -n -E 's/.*Private[Kk]ey: *//p' <<< "$keypair_output" | head -n1 | tr -d '\r')"
+  public_key="$(sed -n -E 's/.*Public[Kk]ey: *//p' <<< "$keypair_output" | head -n1 | tr -d '\r')"
+
+  # Xray v26+ output changed to: PrivateKey / Password / Hash32
+  if [[ -z "$public_key" ]]; then
+    public_key="$(sed -n -E 's/.*Password: *//p' <<< "$keypair_output" | head -n1 | tr -d '\r')"
+  fi
 
   if [[ -z "$private_key" || -z "$public_key" ]]; then
     error "Failed to generate Reality key pair"
