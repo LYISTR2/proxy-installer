@@ -10,15 +10,33 @@ bootstrap_if_needed() {
     return 0
   fi
 
-  local tmp_dir repo_url
+  local tmp_dir repo_url tarball_url
   tmp_dir="$(mktemp -d)"
   repo_url="https://github.com/LYISTR2/proxy-installer.git"
+  tarball_url="https://codeload.github.com/LYISTR2/proxy-installer/tar.gz/refs/heads/main"
 
   echo "[INFO] Bootstrap mode: downloading full repository..."
-  git clone --depth=1 "$repo_url" "$tmp_dir/proxy-installer" >/dev/null 2>&1 || {
-    echo "[ERROR] Failed to clone repository: $repo_url" >&2
-    exit 1
-  }
+
+  if ! command -v git >/dev/null 2>&1; then
+    if command -v apt-get >/dev/null 2>&1; then
+      apt-get update >/dev/null 2>&1 && apt-get install -y git >/dev/null 2>&1 || true
+    elif command -v apk >/dev/null 2>&1; then
+      apk add --no-cache git >/dev/null 2>&1 || true
+    fi
+  fi
+
+  if command -v git >/dev/null 2>&1; then
+    git clone --depth=1 "$repo_url" "$tmp_dir/proxy-installer" >/dev/null 2>&1 || true
+  fi
+
+  if [[ ! -f "$tmp_dir/proxy-installer/install.sh" ]]; then
+    mkdir -p "$tmp_dir/proxy-installer"
+    curl -fsSL "$tarball_url" | tar -xz --strip-components=1 -C "$tmp_dir/proxy-installer" || {
+      echo "[ERROR] Failed to download repository via git and tarball fallback." >&2
+      echo "[ERROR] Please check network access to github.com / codeload.github.com." >&2
+      exit 1
+    }
+  fi
 
   exec bash "$tmp_dir/proxy-installer/install.sh" "$@"
 }
