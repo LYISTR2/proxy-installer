@@ -20,8 +20,12 @@ detect_system() {
     ubuntu|debian)
       _detect_apt_system
       ;;
+    alpine)
+      error "Unsupported system: alpine. v0.1 currently supports Debian/Ubuntu only. Alpine support is planned later."
+      exit 1
+      ;;
     *)
-      error "Unsupported system: ${OS_ID:-unknown}. Only Debian/Ubuntu are supported in v0.1"
+      error "Unsupported system: ${OS_ID:-unknown}. v0.1 currently supports Debian/Ubuntu only."
       exit 1
       ;;
   esac

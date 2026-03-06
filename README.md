@@ -20,8 +20,15 @@ v0.1 先支持：
 
 ## 支持系统
 
+当前 v0.1 仅支持：
+
 - Debian
 - Ubuntu
+
+暂不支持：
+
+- Alpine Linux
+- CentOS / Rocky / AlmaLinux
 
 ## 使用方法
 
